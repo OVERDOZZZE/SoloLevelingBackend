@@ -6,10 +6,8 @@ import cloudinary
 class CloudinaryURLField(serializers.Field):
     def to_representation(self, value):
         url = str(value)
-        # If the value is already a full URL, return it directly.
         if url.startswith('http'):
             return url
-        # Otherwise, assume it's a public id and build the full URL.
         return cloudinary.CloudinaryImage(url).build_url()
 
     def to_internal_value(self, data):
