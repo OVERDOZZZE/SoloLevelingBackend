@@ -8,7 +8,7 @@ import cloudinary.api
 
 SECRET_KEY = config('SECRET_KEY')
 
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 DEBUG = True
 ALLOWED_HOSTS = ['.vercel.app', "*"]
@@ -32,6 +32,7 @@ INSTALLED_LIBRARIES = [
 
     'corsheaders',
     'cloudinary',
+    'storages',
 ]
 
 INSTALLED_APPS = [
@@ -63,7 +64,7 @@ ACCOUNT_EMAIL_VERIFICATION = 'none'
 
 ######
 
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+DEFAULT_FILE_STORAGE = 'storages.backends.cloudinary.CloudinaryStorage'
 
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': config('CLOUD_NAME'),
@@ -102,7 +103,9 @@ MIDDLEWARE = [
     'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.cache.FetchFromCacheMiddleware',
 ]
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+# STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+
 
 CACHE_MIDDLEWARE_SECONDS = 3600  # 1 час
 DATABASES = {
@@ -139,7 +142,10 @@ AUTH_USER_MODEL = 'user.User'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            BASE_DIR / 'src' / 'main' / 'templates',
+            BASE_DIR / 'src' / 'user' / 'templates',
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -159,19 +165,17 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-STATIC_URL = '/static/'
+# settings.py
 
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static"),
-]
-
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-
+STATIC_URL = '/static/'  # URL for static files
+STATICFILES_DIRS = [BASE_DIR / 'static']
+print('ssd', STATICFILES_DIRS)
+STATIC_ROOT = BASE_DIR / 'staticfiles'  # Folder where collectstatic will copy static files
+print('baseeeee', BASE_DIR)
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
 
 JAZZMIN_SETTINGS = {
     # title of the window (Will default to current_admin_site.site_title if absent or None)
@@ -184,10 +188,12 @@ JAZZMIN_SETTINGS = {
     "site_brand": "Library",
 
     # Logo to use for your site, must be present in static files, used for brand on top left
-    "site_logo": "https://res.cloudinary.com/dvo1jlfym/image/upload/v1740445483/logo_oi03vk.png",
+    "site_logo": "images/icon.png",
+    'custom_css': 'css/custom.css',  # Path to your custom CSS file
 
     # Logo to use for your site, must be present in static files, used for login form logo (defaults to site_logo)
-    "login_logo": 'https://res.cloudinary.com/dvo1jlfym/image/upload/v1740445543/palegreen_wxaxoa.png',
+    "login_logo": 'images/palegreen.jpg',
+
 
     # Logo to use for login form in dark themes (defaults to login_logo)
     "login_logo_dark": None,
@@ -196,7 +202,7 @@ JAZZMIN_SETTINGS = {
     "site_logo_classes": "img-circle",
 
     # Relative path to a favicon for your site, will default to site_logo if absent (ideally 32x32 px)
-    "site_icon": "https://res.cloudinary.com/dvo1jlfym/image/upload/v1740445483/logo_oi03vk.png",
+    "site_icon": None,
 
     # Welcome text on the login screen
     "welcome_sign": "Welcome to the library",
@@ -291,7 +297,7 @@ JAZZMIN_SETTINGS = {
     # UI Tweaks #
     #############
     # Relative paths to custom CSS/JS scripts (must be present in static files)
-    "custom_css": None,
+    # "custom_css": None,
     "custom_js": None,
     # Whether to link font from fonts.googleapis.com (use custom_css to supply font otherwise)
     "use_google_fonts_cdn": True,
